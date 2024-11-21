@@ -94,7 +94,7 @@ class VimeoVideoFile {
   int? height;
   String? link;
   String? createdTime;
-  double? fps;
+  int? fps;
   int? size;
   String? md5;
   String? publicName;
