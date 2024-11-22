@@ -43,6 +43,9 @@ class VimeoVideoPlayer extends StatefulWidget {
   /// you need to add your vimeo token
   final String token;
 
+  /// start video muted
+  final bool startMuted;
+
   const VimeoVideoPlayer({
     required this.url,
     this.systemUiOverlay = const [
@@ -61,6 +64,7 @@ class VimeoVideoPlayer extends StatefulWidget {
     this.autoPlay = false,
     this.dioOptionsForVimeoVideoConfig,
     required this.token,
+    required this.startMuted,
     super.key,
   });
 
@@ -128,7 +132,7 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
             'Unable extract video id from given vimeo video url: ${widget.url}'));
       }
 
-      if (currentLink == '') _videoPlayer('', Duration(seconds: 0));
+      if (currentLink == '') _videoPlayer('', const Duration(seconds: 0));
     } else {
       throw (Exception('Invalid vimeo video url: ${widget.url}'));
     }
@@ -205,7 +209,7 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
   void _setVideoInitialPosition(Duration goTo) {
     Duration? startAt = widget.startAt;
 
-    if (goTo != Duration(seconds: 0)) {
+    if (goTo != const Duration(seconds: 0)) {
       startAt = goTo;
     }
 
@@ -247,7 +251,7 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
   }
 
   void _checkPlayingStatus() {
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (_videoPlayerController != null &&
           _videoPlayerController!.value.isInitialized) {
         VideoPlayerValue videoData = _videoPlayerController!.value;
@@ -274,7 +278,6 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
       List<VimeoVideoFile>? files = progressiveList;
 
       var vimeoMp4Video = '';
-
 
       if (files != null && files.isNotEmpty) {
         this.files.value = files;
@@ -306,6 +309,7 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
 
       _videoPlayerController =
           VideoPlayerController.networkUrl(Uri.parse(vimeoMp4Video));
+
       _setVideoInitialPosition(duration);
       _setVideoListeners();
 
@@ -315,6 +319,8 @@ class _VimeoVideoPlayerState extends State<VimeoVideoPlayer> {
         autoPlay: widget.autoPlay,
         // ignore: use_build_context_synchronously
       )..registerContext(context);
+
+      if (widget.startMuted) _flickManager?.flickControlManager?.mute();
 
       isVimeoVideoLoaded.value = !isVimeoVideoLoaded.value;
     });
